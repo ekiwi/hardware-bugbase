@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+
+jobs:
+  tests:
+    name: Compile and Run
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Dependencies
+      run: sudo apt install -y verilator
+    - name: check versions
+      run: verilator --version
+    - name: make sim
+      run: |
+        cd c1-dead-lock-sdspi
+        make sim
+    - uses: actions/upload-artifact@v3
+      with:
+        name: c1-dead-lock-sdspi
+        path: c1-dead-lock-sdspi/trace.vcd
+
