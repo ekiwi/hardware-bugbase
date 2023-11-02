@@ -5,14 +5,14 @@ TOP_MODULE?=ccip_std_afu_wrapper
 RTL_WORK_DIR?=work
 TEST_DIR?=test
 
-VERILATOR=../../veripass/verilator/bin/verilator
+VERILATOR=verilator
+VERILATOR_ROOT=`$(VERILATOR) --getenv VERILATOR_ROOT`
 VERILATOR_OPT?=
 VERILATOR_OPT+= -cc
 VERILATOR_OPT+= -Wno-WIDTH -Wno-LITENDIAN -Wno-UNPACKED -Wno-BLKANDNBLK -Wno-CASEINCOMPLETE \
-				-Wno-CASEX -Wno-TIMESCALEMOD -Wno-PINMISSING -Wno-ALWCOMBORDER -Wno-VLTAG
+				-Wno-CASEX -Wno-TIMESCALEMOD -Wno-PINMISSING -Wno-ALWCOMBORDER -Wno-LATCH
 VERILATOR_OPT+= -trace-fst -trace-structs -comp-limit-syms 0
 VERILATOR_OPT+= -assert -trace-max-array 65536 -trace-max-width 65536
-VERILATOR_ROOT=$(CURDIR)/../../veripass/verilator
 
 CXX?= g++
 CXX_OPT?=
