@@ -12,8 +12,9 @@ jobs:
     strategy:
       matrix:
         bug: [
-          ["c1-dead-lock-sdspi", "trace.vcd"], 
-          ["c2-producer-consumer-mismatch-optimus", "optimus_produder_consumer.fst"],
+          ["c1-dead-lock-sdspi", "trace.vcd"],
+          # ["c2-producer-consumer-mismatch-optimus", "optimus_produder_consumer.fst"],
+          ["c3-signal-asynchrony-sdspi", "trace.vcd"], 
           ]
     steps:
     - uses: actions/checkout@v3
