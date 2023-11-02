@@ -44,7 +44,7 @@ clean:
 sim: sdcard
 	@echo -e "\033[0;31mAssertion is not available. Please wait for 3 seconds and the simulation will be killed.\033[0m"
 	@echo -e "\033[0;31mPlease take a look of waveform. The sdcard clock o_sclk is not generated. The root cause is at rtl/llsdspi.v:182.\033[0m"
-	timeout 3 ./$(TEST_BIN)
+	-timeout 3 ./$(TEST_BIN)
 
 wave:
 	gtkwave trace.vcd > /dev/null 2>/dev/null &
