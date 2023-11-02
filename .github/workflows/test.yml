@@ -18,6 +18,7 @@ jobs:
     - name: make sim
       run: |
         cd c1-dead-lock-sdspi
+        make
         make sim
     - uses: actions/upload-artifact@v3
       with:
