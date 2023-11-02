@@ -40,7 +40,7 @@ clean:
 	rm -rf build_* withtask.* notask.* sources.withtask.txt sources.notask.txt bug5_step4.v
 
 sim:
-	./$(TEST_BIN) test/config-1.txt optimus_produder_consumer.fst
+	-./$(TEST_BIN) test/config-1.txt optimus_produder_consumer.fst
 
 wave:
 	gtkwave optimus_produder_consumer.fst > /dev/null 2>/dev/null &
