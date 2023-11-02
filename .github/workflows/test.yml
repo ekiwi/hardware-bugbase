@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies
-      run: sudo apt install -y verilator
+      run: sudo apt-get install -y verilator  qemu-utils
     - name: check versions
       run: verilator --version
     - name: make sim
