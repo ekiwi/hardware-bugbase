@@ -16,6 +16,7 @@ jobs:
           # ["c2-producer-consumer-mismatch-optimus", "optimus_produder_consumer.fst"],
           ["c3-signal-asynchrony-sdspi", "trace.vcd"],
           ["c4-signal-asynchrony-axi-stream-fifo", "test_axis_async_fifo.fst"], 
+          ["d9-endianness-mismatch-sdspi", "trace.vcd"],
           ]
     steps:
     - uses: actions/checkout@v3
