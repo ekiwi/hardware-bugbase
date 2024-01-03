@@ -26,17 +26,9 @@ THE SOFTWARE.
 
 `timescale 1ns / 1ps
 
-module test_axis_adapter_64_8();
+module test_axis_adapter_64_8(input clk);
 
 reg genclock;
-reg clk;
-
-initial begin
-    clk = 0;
-    forever begin
-        #1 clk = ~clk; 
-    end
-end
 
 // parameters
 localparam INPUT_DATA_WIDTH = 64;
@@ -46,7 +38,7 @@ localparam OUTPUT_KEEP_WIDTH = (OUTPUT_DATA_WIDTH/8);
 
 // Inputs
 reg [31:0] cycle = 0;
-reg rst = 0;
+reg rst = 1;
 reg [7:0] current_test = 0;
 
 reg [INPUT_DATA_WIDTH-1:0] input_axis_tdata = 0;
@@ -63,6 +55,19 @@ wire [OUTPUT_KEEP_WIDTH-1:0] output_axis_tkeep;
 wire output_axis_tvalid;
 wire output_axis_tlast;
 wire output_axis_tuser;
+
+/* not supported by Verilator, use iverilog
+integer f;
+// dump I/O
+initial begin
+  f = $fopen("output.txt");
+  $fwrite(f, "rst, input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser\n");
+  forever begin
+    @(posedge clk);
+    $fwrite(f, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", rst, input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser);
+  end
+end
+*/
 
 initial begin
     // myhdl integration
@@ -144,16 +149,7 @@ end
       end
 `endif // DUMP_TRACE
 
-    integer f;
-      // dump I/O
-      initial begin
-        f = $fopen("output.txt");
-        $fwrite(f, "input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser\n");
-        forever begin
-          @(posedge clk);
-          $fwrite(f, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser);
-        end
-      end
+
   
       
 
