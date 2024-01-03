@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <verilated_vcd_c.h>
+#include <iostream>
+#include <fstream>
 
 #define	TBASSERT(TB,A) do { if (!(A)) { (TB).closetrace(); } assert(A); } while(0);
 
@@ -50,6 +52,7 @@ public:
 	VA		*m_core;
 	VerilatedVcdC*	m_trace;
 	uint64_t	m_tickcount;
+	std::ofstream trace;
 
 	TESTB(void) : m_trace(NULL), m_tickcount(0l) {
 		m_core = new VA;
@@ -68,6 +71,10 @@ public:
 			m_trace = new VerilatedVcdC;
 			m_core->trace(m_trace, 99);
 			m_trace->open(vcdname);
+
+			// open output text file
+			trace.open("output.txt");
+			trace << "i_wb_cyc, i_wb_stb, i_wb_we, i_wb_addr, i_wb_data, o_wb_ack, o_wb_stall, o_wb_data, o_cs_n, o_sck, o_mosi, i_miso, o_int, i_bus_grant, o_debug" << std::endl;
 		}
 	}
 
@@ -76,6 +83,7 @@ public:
 			m_trace->close();
 			delete m_trace;
 			m_trace = NULL;
+			trace.close();
 		}
 	}
 
@@ -86,6 +94,7 @@ public:
 	virtual	void	tick(void) {
 		m_tickcount++;
 
+
 		// Make sure we have our evaluations straight before the top
 		// of the clock.  This is necessary since some of the
 		// connection modules may have made changes, for which some
@@ -93,6 +102,28 @@ public:
 		// before the top of the clock.
 		eval();
 		if (m_trace) m_trace->dump((vluint64_t)(10*m_tickcount-2));
+
+		// sample expected values _before_ clock edge
+		if (m_trace) {
+			trace << static_cast<uint64_t>(m_core->i_wb_cyc) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_wb_stb) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_wb_we) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_wb_addr) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_wb_data) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_wb_ack) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_wb_stall) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_wb_data) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_cs_n) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_sck) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_mosi) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_miso) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_int) << ", ";
+			trace << static_cast<uint64_t>(m_core->i_bus_grant) << ", ";
+			trace << static_cast<uint64_t>(m_core->o_debug) << std::endl;
+			trace.flush();
+		}
+
+
 		m_core->i_clk = 1;
 		eval();
 		if (m_trace) m_trace->dump((vluint64_t)(10*m_tickcount));
