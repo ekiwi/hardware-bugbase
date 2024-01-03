@@ -4,3 +4,5 @@ work/
 *.vcd
 fadd_test
 bug.v
+axis_fifo_test
+output.txt
