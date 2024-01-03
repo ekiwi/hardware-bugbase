@@ -26,7 +26,17 @@ THE SOFTWARE.
 
 `timescale 1ns / 1ps
 
-module test_axis_adapter_64_8(input clk, output reg genclock);
+module test_axis_adapter_64_8();
+
+reg genclock;
+reg clk;
+
+initial begin
+    clk = 0;
+    forever begin
+        #1 clk = ~clk; 
+    end
+end
 
 // parameters
 localparam INPUT_DATA_WIDTH = 64;
@@ -127,14 +137,34 @@ always @(*) begin
     end
 end
 
+`ifdef DUMP_TRACE // used for our OSDD calculations
+      initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, UUT);
+      end
+`endif // DUMP_TRACE
+
+    integer f;
+      // dump I/O
+      initial begin
+        f = $fopen("output.txt");
+        $fwrite(f, "input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser\n");
+        forever begin
+          @(posedge clk);
+          $fwrite(f, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", input_axis_tdata, input_axis_tkeep, input_axis_tvalid, input_axis_tready, input_axis_tlast, input_axis_tuser, output_axis_tdata, output_axis_tkeep, output_axis_tvalid, output_axis_tready, output_axis_tlast, output_axis_tuser);
+        end
+      end
+  
+      
+
 
 axis_adapter 
-/* #(
+#(
     .INPUT_DATA_WIDTH(INPUT_DATA_WIDTH),
     .INPUT_KEEP_WIDTH(INPUT_KEEP_WIDTH),
     .OUTPUT_DATA_WIDTH(OUTPUT_DATA_WIDTH),
     .OUTPUT_KEEP_WIDTH(OUTPUT_KEEP_WIDTH)
-)*/
+)
 UUT (
     .clk(clk),
     .rst(rst),
