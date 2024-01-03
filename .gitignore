@@ -9,3 +9,7 @@ __pycache__
 *displayinfo*
 *widthinfo*
 .Xil
+# iverilog output
+a.out
+# VS Code
+.vscode/
