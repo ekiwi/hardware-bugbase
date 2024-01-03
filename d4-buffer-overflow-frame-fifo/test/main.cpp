@@ -10,6 +10,7 @@
 #include <exception>
 #include <csetjmp>
 #include <csignal>
+#include <fstream>
 
 #include "Vaxis_fifo_wrapper.h"
 
@@ -30,6 +31,24 @@ void sc_time_step() {
     timestamp += pst;
 }
 
+void dump_ios(Vaxis_fifo_wrapper *tb, std::ofstream &o) {
+    o << static_cast<uint64_t>(tb->s_axis_tdata) << ", ";
+    o << static_cast<uint64_t>(tb->s_axis_tvalid) << ", ";
+    o << static_cast<uint64_t>(tb->s_axis_tready) << ", ";
+    o << static_cast<uint64_t>(tb->s_axis_tlast) << ", ";
+    o << static_cast<uint64_t>(tb->s_axis_tuser) << ", ";
+
+    o << static_cast<uint64_t>(tb->m_axis_tdata) << ", ";
+    o << static_cast<uint64_t>(tb->m_axis_tvalid) << ", ";
+    o << static_cast<uint64_t>(tb->m_axis_tready) << ", ";
+    o << static_cast<uint64_t>(tb->m_axis_tlast) << ", ";
+    o << static_cast<uint64_t>(tb->m_axis_tuser) << ", ";
+
+    o << static_cast<uint64_t>(tb->status_overflow) << ", ";
+    o << static_cast<uint64_t>(tb->status_bad_frame) << ", ";
+    o << static_cast<uint64_t>(tb->status_good_frame) << std::endl;
+}
+
 int main(int argc, char **argv) {
     Verilated::commandArgs(argc, argv);
     Vaxis_fifo_wrapper *tb = new Vaxis_fifo_wrapper;
@@ -38,6 +57,11 @@ int main(int argc, char **argv) {
     VerilatedFstC *trace = new VerilatedFstC;
     tb->trace(trace, 99);
     trace->open("axis_fifo.fst");
+    std::ofstream output_txt;
+    output_txt.open("output.txt");
+    output_txt << "s_axis_tdata, s_axis_tvalid, s_axis_tready, s_axis_tlast, s_axis_tuser, ";
+    output_txt << "m_axis_tdata, m_axis_tvalid, m_axis_tready, m_axis_tlast, m_axis_tuser, ";
+    output_txt << "status_overflow, status_bad_frame, status_good_frame" << std::endl;
 
     if (setjmp(jmp_env) == 0) {
         signal(SIGABRT, &sig_handler);
@@ -55,6 +79,7 @@ int main(int argc, char **argv) {
     tb->eval();
 
     for (int i = 0; i < 10; i++) {
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         trace->dump(timestamp);
@@ -68,6 +93,7 @@ int main(int argc, char **argv) {
     tb->rst = 0;
     tb->eval();
     for (int i = 0; i < 5; i++) {
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         trace->dump(timestamp);
@@ -86,6 +112,7 @@ int main(int argc, char **argv) {
             tb->s_axis_tuser = 0;
             tb->eval();
 
+            dump_ios(tb, output_txt);
             tb->clk = 1;
             tb->eval();
             trace->dump(timestamp);
@@ -102,6 +129,7 @@ int main(int argc, char **argv) {
         tb->s_axis_tuser = 0;
         tb->eval();
 
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         trace->dump(timestamp);
@@ -117,6 +145,7 @@ int main(int argc, char **argv) {
         tb->s_axis_tuser = 0;
         tb->eval();
         for (int i = 0; i < 5; i++) {
+            dump_ios(tb, output_txt);
             tb->clk = 1;
             tb->eval();
             trace->dump(timestamp);
@@ -126,12 +155,14 @@ int main(int argc, char **argv) {
             trace->dump(timestamp);
             sc_time_step();
         }
+        dump_ios(tb, output_txt);
     }
 
 save_trace_and_exit:
 
     trace->flush();
     trace->close();
+    output_txt.close();
 
     exit(EXIT_SUCCESS);
 }

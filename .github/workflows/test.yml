@@ -17,6 +17,7 @@ jobs:
           ["c3-signal-asynchrony-sdspi", "trace.vcd"],
           ["c4-signal-asynchrony-axi-stream-fifo", "test_axis_async_fifo.fst"], 
           ["d9-endianness-mismatch-sdspi", "trace.vcd"],
+          ["d4-buffer-overflow-frame-fifo", "axis_fifo.fst"],
           ]
     steps:
     - uses: actions/checkout@v3
