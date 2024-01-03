@@ -32,6 +32,8 @@ void sc_time_step() {
 }
 
 void dump_ios(Vaxis_fifo_wrapper *tb, std::ofstream &o) {
+    o << static_cast<uint64_t>(tb->rst) << ", ";
+
     o << static_cast<uint64_t>(tb->s_axis_tdata) << ", ";
     o << static_cast<uint64_t>(tb->s_axis_tvalid) << ", ";
     o << static_cast<uint64_t>(tb->s_axis_tready) << ", ";
@@ -59,6 +61,7 @@ int main(int argc, char **argv) {
     trace->open("axis_fifo.fst");
     std::ofstream output_txt;
     output_txt.open("output.txt");
+    output_txt << "rst, ";
     output_txt << "s_axis_tdata, s_axis_tvalid, s_axis_tready, s_axis_tlast, s_axis_tuser, ";
     output_txt << "m_axis_tdata, m_axis_tvalid, m_axis_tready, m_axis_tlast, m_axis_tuser, ";
     output_txt << "status_overflow, status_bad_frame, status_good_frame" << std::endl;
