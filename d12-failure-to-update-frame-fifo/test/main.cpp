@@ -82,6 +82,8 @@ int main(int argc, char **argv) {
     } else {
         goto save_trace_and_exit;
     }
+
+    tb->eval();
    
     while (!Verilated::gotFinish()) {
         dump_ios(tb, output_txt);
