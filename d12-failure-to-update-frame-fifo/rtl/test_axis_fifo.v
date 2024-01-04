@@ -55,27 +55,27 @@ parameter ADDR_WIDTH = (KEEP_ENABLE && KEEP_WIDTH > 1) ? $clog2(DEPTH/KEEP_WIDTH
 // Inputs
 reg [31:0] cycle = 0;
 
-reg rst = 0;
+reg rst /*verilator public*/ = 0;
 reg [7:0] current_test = 0;
 
-reg [DATA_WIDTH-1:0] s_axis_tdata = 0;
-reg [KEEP_WIDTH-1:0] s_axis_tkeep = 0;
-reg s_axis_tvalid = 0;
-reg s_axis_tlast = 0;
-reg [ID_WIDTH-1:0] s_axis_tid = 0;
-reg [DEST_WIDTH-1:0] s_axis_tdest = 0;
-reg [USER_WIDTH-1:0] s_axis_tuser = 0;
-reg m_axis_tready = 0;
+reg [DATA_WIDTH-1:0] s_axis_tdata /*verilator public*/ = 0;
+reg [KEEP_WIDTH-1:0] s_axis_tkeep /*verilator public*/ = 0;
+reg s_axis_tvalid /*verilator public*/ = 0;
+reg s_axis_tlast /*verilator public*/ = 0;
+reg [ID_WIDTH-1:0] s_axis_tid /*verilator public*/ = 0;
+reg [DEST_WIDTH-1:0] s_axis_tdest /*verilator public*/ = 0;
+reg [USER_WIDTH-1:0] s_axis_tuser /*verilator public*/ = 0;
+reg m_axis_tready /*verilator public*/ = 0;
 
 // Outputs
-wire s_axis_tready;
-wire [DATA_WIDTH-1:0] m_axis_tdata;
-wire [KEEP_WIDTH-1:0] m_axis_tkeep;
-wire m_axis_tvalid;
-wire m_axis_tlast;
-wire [ID_WIDTH-1:0] m_axis_tid;
-wire [DEST_WIDTH-1:0] m_axis_tdest;
-wire [USER_WIDTH-1:0] m_axis_tuser;
+wire s_axis_tready /*verilator public*/;
+wire [DATA_WIDTH-1:0] m_axis_tdata /*verilator public*/;
+wire [KEEP_WIDTH-1:0] m_axis_tkeep /*verilator public*/;
+wire m_axis_tvalid /*verilator public*/;
+wire m_axis_tlast /*verilator public*/;
+wire [ID_WIDTH-1:0] m_axis_tid /*verilator public*/;
+wire [DEST_WIDTH-1:0] m_axis_tdest /*verilator public*/;
+wire [USER_WIDTH-1:0] m_axis_tuser /*verilator public*/;
 
 initial begin
     // myhdl integration

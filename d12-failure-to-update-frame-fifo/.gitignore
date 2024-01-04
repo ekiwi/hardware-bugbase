@@ -3,3 +3,4 @@ work/
 *.fst
 *.vcd
 axis_fifo_test
+output.txt
