@@ -19,6 +19,7 @@ jobs:
           ["d9-endianness-mismatch-sdspi", "trace.vcd"],
           ["d4-buffer-overflow-frame-fifo", "axis_fifo.fst"],
           ["d13-failure-to-update-frame-len", "axis_frame_len_8_test.fst"],
+          ["d12-failure-to-update-frame-fifo", "axis_fifo_test.fst"],
           ]
     steps:
     - uses: actions/checkout@v3
