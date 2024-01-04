@@ -26,51 +26,29 @@ THE SOFTWARE.
 
 `timescale 1ns / 1ps
 
+/*verilator lint_off SELRANGE*/
+
 /*
  * AXI4-Stream FIFO
  */
 module axis_fifo #
 (
-    // FIFO depth in words
-    // KEEP_WIDTH words per cycle if KEEP_ENABLE set
-    // Rounded up to nearest power of 2 cycles
-    parameter DEPTH = 4,
-    // Width of AXI stream interfaces in bits
+    parameter ADDR_WIDTH = 12,
     parameter DATA_WIDTH = 8,
-    // Propagate tkeep signal
-    // If disabled, tkeep assumed to be 1'b1
     parameter KEEP_ENABLE = (DATA_WIDTH>8),
-    // tkeep signal width (words per cycle)
     parameter KEEP_WIDTH = (DATA_WIDTH/8),
-    // Propagate tlast signal
     parameter LAST_ENABLE = 1,
-    // Propagate tid signal
-    parameter ID_ENABLE = 1,
-    // tid signal width
+    parameter ID_ENABLE = 0,
     parameter ID_WIDTH = 8,
-    // Propagate tdest signal
-    parameter DEST_ENABLE = 1,
-    // tdest signal width
+    parameter DEST_ENABLE = 0,
     parameter DEST_WIDTH = 8,
-    // Propagate tuser signal
     parameter USER_ENABLE = 1,
-    // tuser signal width
     parameter USER_WIDTH = 1,
-    // Frame FIFO mode - operate on frames instead of cycles
-    // When set, m_axis_tvalid will not be deasserted within a frame
-    // Requires LAST_ENABLE set
-    parameter FRAME_FIFO = 1,
-    // tuser value for bad frame marker
+    parameter FRAME_FIFO = 0,
     parameter USER_BAD_FRAME_VALUE = 1'b1,
-    // tuser mask for bad frame marker
     parameter USER_BAD_FRAME_MASK = 1'b1,
-    // Drop frames marked bad
-    // Requires FRAME_FIFO set
     parameter DROP_BAD_FRAME = 0,
-    // Drop incoming frames when full
-    // When set, s_axis_tready is always asserted
-    // Requires FRAME_FIFO set
-    parameter DROP_WHEN_FULL = 1
+    parameter DROP_WHEN_FULL = 0
 )
 (
     input  wire                   clk,
@@ -108,30 +86,31 @@ module axis_fifo #
     output wire                   status_good_frame
 );
 
-parameter ADDR_WIDTH = (KEEP_ENABLE && KEEP_WIDTH > 1) ? $clog2(DEPTH/KEEP_WIDTH) : $clog2(DEPTH);
 
+/* DISABLED Simulation Only Construct
 // check configuration
 initial begin
     if (FRAME_FIFO && !LAST_ENABLE) begin
-        $error("Error: FRAME_FIFO set requires LAST_ENABLE set (instance %m)");
+        $error("Error: FRAME_FIFO set requires LAST_ENABLE set");
         $finish;
     end
 
     if (DROP_BAD_FRAME && !FRAME_FIFO) begin
-        $error("Error: DROP_BAD_FRAME set requires FRAME_FIFO set (instance %m)");
+        $error("Error: DROP_BAD_FRAME set requires FRAME_FIFO set");
         $finish;
     end
 
     if (DROP_WHEN_FULL && !FRAME_FIFO) begin
-        $error("Error: DROP_WHEN_FULL set requires FRAME_FIFO set (instance %m)");
+        $error("Error: DROP_WHEN_FULL set requires FRAME_FIFO set");
         $finish;
     end
 
     if (DROP_BAD_FRAME && (USER_BAD_FRAME_MASK & {USER_WIDTH{1'b1}}) == 0) begin
-        $error("Error: Invalid USER_BAD_FRAME_MASK value (instance %m)");
+        $error("Error: Invalid USER_BAD_FRAME_MASK value");
         $finish;
     end
 end
+*/
 
 localparam KEEP_OFFSET = DATA_WIDTH;
 localparam LAST_OFFSET = KEEP_OFFSET + (KEEP_ENABLE ? KEEP_WIDTH : 0);
@@ -140,20 +119,25 @@ localparam DEST_OFFSET = ID_OFFSET   + (ID_ENABLE   ? ID_WIDTH   : 0);
 localparam USER_OFFSET = DEST_OFFSET + (DEST_ENABLE ? DEST_WIDTH : 0);
 localparam WIDTH       = USER_OFFSET + (USER_ENABLE ? USER_WIDTH : 0);
 
-reg [ADDR_WIDTH:0] wr_ptr_reg = {ADDR_WIDTH+1{1'b0}}, wr_ptr_next;
-reg [ADDR_WIDTH:0] wr_ptr_cur_reg = {ADDR_WIDTH+1{1'b0}}, wr_ptr_cur_next;
+reg [ADDR_WIDTH:0] wr_ptr_reg = {ADDR_WIDTH+1{1'b0}};
+reg [ADDR_WIDTH:0] wr_ptr_next;
+reg [ADDR_WIDTH:0] wr_ptr_cur_reg = {ADDR_WIDTH+1{1'b0}};
+reg [ADDR_WIDTH:0] wr_ptr_cur_next;
 reg [ADDR_WIDTH:0] wr_addr_reg = {ADDR_WIDTH+1{1'b0}};
-reg [ADDR_WIDTH:0] rd_ptr_reg = {ADDR_WIDTH+1{1'b0}}, rd_ptr_next;
+reg [ADDR_WIDTH:0] rd_ptr_reg = {ADDR_WIDTH+1{1'b0}};
+reg [ADDR_WIDTH:0] rd_ptr_next;
 reg [ADDR_WIDTH:0] rd_addr_reg = {ADDR_WIDTH+1{1'b0}};
 
 reg [WIDTH-1:0] mem[(2**ADDR_WIDTH)-1:0];
 reg [WIDTH-1:0] mem_read_data_reg;
-reg mem_read_data_valid_reg = 1'b0, mem_read_data_valid_next;
+reg mem_read_data_valid_reg = 1'b0;
+reg mem_read_data_valid_next;
 
 wire [WIDTH-1:0] s_axis;
 
 reg [WIDTH-1:0] m_axis_reg;
-reg m_axis_tvalid_reg = 1'b0, m_axis_tvalid_next;
+reg m_axis_tvalid_reg = 1'b0;
+reg m_axis_tvalid_next;
 
 // full when first MSB different but rest same
 wire full = ((wr_ptr_reg[ADDR_WIDTH] != rd_ptr_reg[ADDR_WIDTH]) &&
@@ -171,10 +155,14 @@ reg write;
 reg read;
 reg store_output;
 
-reg drop_frame_reg = 1'b0, drop_frame_next;
-reg overflow_reg = 1'b0, overflow_next;
-reg bad_frame_reg = 1'b0, bad_frame_next;
-reg good_frame_reg = 1'b0, good_frame_next;
+reg drop_frame_reg = 1'b0;
+reg drop_frame_next;
+reg overflow_reg = 1'b0;
+reg overflow_next;
+reg bad_frame_reg = 1'b0;
+reg bad_frame_next;
+reg good_frame_reg = 1'b0;
+reg good_frame_next;
 
 assign s_axis_tready = FRAME_FIFO ? (!full_cur || full_wr || DROP_WHEN_FULL) : !full;
 
@@ -199,6 +187,16 @@ assign m_axis_tuser = USER_ENABLE ? m_axis_reg[USER_OFFSET +: USER_WIDTH] : {USE
 assign status_overflow = overflow_reg;
 assign status_bad_frame = bad_frame_reg;
 assign status_good_frame = good_frame_reg;
+
+
+/* DISABLED Simulation Only Construct
+always @(posedge clk) begin
+    if (!rst) begin
+        if ((s_axis_tvalid && s_axis_tready) && !(m_axis_tvalid && m_axis_tready) && wr_ptr_cur_reg[ADDR_WIDTH] != rd_ptr_reg[ADDR_WIDTH] && wr_ptr_cur_reg[ADDR_WIDTH-1:0] == rd_ptr_reg[ADDR_WIDTH-1:0])
+            $error("buffer overflow");
+    end
+end
+*/
 
 // Write logic
 always @* begin
@@ -233,6 +231,7 @@ always @* begin
             wr_ptr_cur_next = wr_ptr_cur_reg + 1;
             if (s_axis_tlast) begin
                 // end of frame
+                //if (DROP_BAD_FRAME && (USER_BAD_FRAME_MASK & s_axis_tuser == USER_BAD_FRAME_VALUE)) begin
                 if (DROP_BAD_FRAME && USER_BAD_FRAME_MASK & ~(s_axis_tuser ^ USER_BAD_FRAME_VALUE)) begin
                     // bad packet, reset write pointer
                     wr_ptr_cur_next = wr_ptr_reg;
