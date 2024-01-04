@@ -47,7 +47,10 @@ parameter FRAME_FIFO = 1;
 parameter USER_BAD_FRAME_VALUE = 1'b1;
 parameter USER_BAD_FRAME_MASK = 1'b1;
 parameter DROP_BAD_FRAME = 0;
-parameter DROP_WHEN_FULL = 0;
+parameter DROP_WHEN_FULL = 1;
+
+// derived
+parameter ADDR_WIDTH = (KEEP_ENABLE && KEEP_WIDTH > 1) ? $clog2(DEPTH/KEEP_WIDTH) : $clog2(DEPTH);
 
 // Inputs
 reg [31:0] cycle = 0;
@@ -195,8 +198,8 @@ always @(*) begin
 end
 
 axis_fifo 
-/*#(
-    .DEPTH(DEPTH),
+#(
+    .ADDR_WIDTH(ADDR_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
     .KEEP_ENABLE(KEEP_ENABLE),
     .KEEP_WIDTH(KEEP_WIDTH),
@@ -213,7 +216,6 @@ axis_fifo
     .DROP_BAD_FRAME(DROP_BAD_FRAME),
     .DROP_WHEN_FULL(DROP_WHEN_FULL)
 )
-*/
 UUT (
     .clk(clk),
     .rst(rst),
