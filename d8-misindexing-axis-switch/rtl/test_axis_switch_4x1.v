@@ -146,7 +146,9 @@ always @(*) begin
 end
 
 
-axis_switch #(
+axis_switch
+/* disabled to test default parameterization which should match
+#(
     .M_COUNT(M_COUNT),
     .S_COUNT(S_COUNT),
     .DATA_WIDTH(DATA_WIDTH),
@@ -165,6 +167,7 @@ axis_switch #(
     .ARB_TYPE("ROUND_ROBIN"),
     .LSB_PRIORITY("HIGH")
 )
+*/
 UUT (
     .clk(clk),
     .rst(rst),
