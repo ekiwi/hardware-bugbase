@@ -142,7 +142,6 @@ always @(*) begin
         if (!m_axis_tvalid && m_axis_tlast) begin  //output data should be 0xcd 0xab 0xcd 0xab 0xcd, with tlast==1 at the last 0xcd
             $display("@@@Error: The data from input is not outputed!");
         end
-        $finish;
     end
 end
 
