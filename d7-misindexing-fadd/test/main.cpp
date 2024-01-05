@@ -10,6 +10,7 @@
 #include <exception>
 #include <csetjmp>
 #include <csignal>
+#include <fstream>
 
 #include "Vfadd.h"
 
@@ -28,6 +29,16 @@ double sc_time_stamp() {
 }
 void sc_time_step() {
     timestamp += pst;
+}
+
+void dump_ios(Vfadd *tb, std::ofstream &o) {
+    o << static_cast<uint64_t>(tb->rst) << ", ";
+    o << static_cast<uint64_t>(tb->en)  << ", ";
+    o << static_cast<uint64_t>(tb->op1) << ", ";
+    o << static_cast<uint64_t>(tb->op2) << ", ";
+    o << static_cast<uint64_t>(tb->res_val_correct) << ", ";
+    o << static_cast<uint64_t>(tb->res_correct) << std::endl;
+    o.flush();
 }
 
 uint32_t op1[8] = {
@@ -61,6 +72,9 @@ int main(int argc, char **argv) {
     VerilatedFstC *trace = new VerilatedFstC;
     tb->trace(trace, 99);
     trace->open("fadd.fst");
+    std::ofstream output_txt;
+    output_txt.open("output.txt");
+    output_txt << "rst, en, op1, op2, res_val, res" << std::endl;
 
     if (setjmp(jmp_env) == 0) {
         signal(SIGABRT, &sig_handler);
@@ -77,6 +91,7 @@ int main(int argc, char **argv) {
     tb->en = 0;
     tb->eval();
 
+    dump_ios(tb, output_txt);
     tb->clk = 1;
     tb->eval();
     sc_time_step();
@@ -85,6 +100,8 @@ int main(int argc, char **argv) {
     sc_time_step();
 
     tb->rst = 0;
+    tb->eval();
+    dump_ios(tb, output_txt);
     tb->clk = 1;
     tb->eval();
     sc_time_step();
@@ -104,6 +121,8 @@ int main(int argc, char **argv) {
 
         tb->op1 = op1[i];
         tb->op2 = op2[i];
+        tb->eval();
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         sc_time_step();
@@ -122,6 +141,8 @@ int main(int argc, char **argv) {
             outcnt++;
         }
 
+        tb->eval();
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         sc_time_step();
@@ -134,6 +155,7 @@ save_trace_and_exit:
 
     trace->flush();
     trace->close();
+    output_txt.close();
 
     exit(EXIT_SUCCESS);
 }
