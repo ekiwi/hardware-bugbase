@@ -4,3 +4,4 @@ work/
 *.lxt
 test_axis_switch_4x4
 test_axis_switch_4x1
+output.txt

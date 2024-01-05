@@ -10,8 +10,10 @@
 #include <exception>
 #include <csetjmp>
 #include <csignal>
+#include <fstream>
 
 #include "Vtest_axis_switch_4x1.h"
+#include "Vtest_axis_switch_4x1_test_axis_switch_4x1.h"
 
 using namespace std;
 
@@ -31,6 +33,29 @@ void sc_time_step() {
     timestamp += pst;
 }
 
+void dump_ios(Vtest_axis_switch_4x1 *tb, std::ofstream &o) {
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->rst) << ", ";
+
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tdata) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tkeep) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tvalid) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tready) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tlast) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tid) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tdest) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->s_axis_tuser) << ", ";
+
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tdata) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tkeep) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tvalid) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tready) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tlast) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tid) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tdest) << ", ";
+    o << static_cast<uint64_t>(tb->test_axis_switch_4x1->m_axis_tuser) << std::endl;
+    o.flush();
+}
+
 int main(int argc, char **argv) {
     
 
@@ -42,6 +67,12 @@ int main(int argc, char **argv) {
     tb->trace(trace, 99);
     string waveform = string(argv[0])+".fst";
     trace->open(waveform.c_str());
+    std::ofstream output_txt;
+    output_txt.open("output.txt");
+    output_txt << "rst, ";
+    output_txt << "s_axis_tdata, s_axis_tkeep, s_axis_tvalid, s_axis_tready, s_axis_tlast, s_axis_tid, s_axis_tdest, s_axis_tuser, ";
+    output_txt << "m_axis_tdata, m_axis_tkeep, m_axis_tvalid, m_axis_tready, m_axis_tlast, m_axis_tid, m_axis_tdest, m_axis_tuser";
+    output_txt << std::endl;
     
     
     if (setjmp(jmp_env) == 0) {
@@ -51,7 +82,10 @@ int main(int argc, char **argv) {
         goto save_trace_and_exit;
     }
    
+    tb->eval();
+
     while (!Verilated::gotFinish()) {
+        dump_ios(tb, output_txt);
         tb->clk = 1;
         tb->eval();
         trace->dump(timestamp);
@@ -62,6 +96,7 @@ int main(int argc, char **argv) {
         trace->dump(timestamp);
         sc_time_step();
     }
+    dump_ios(tb, output_txt);
     delete tb;
 
 
@@ -69,6 +104,7 @@ save_trace_and_exit:
 
     trace->flush();
     trace->close();
+    output_txt.close();
 
     exit(EXIT_SUCCESS);
     

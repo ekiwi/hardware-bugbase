@@ -52,29 +52,29 @@ parameter ARB_LSB_HIGH_PRIORITY = 1;
 
 // Inputs
 
-reg rst = 0;
+reg rst /*verilator public*/ = 0;
 reg [7:0] current_test = 0;
 
 reg [31:0] cycle = 0;
 
-reg [S_COUNT*DATA_WIDTH-1:0] s_axis_tdata = 0;
-reg [S_COUNT*KEEP_WIDTH-1:0] s_axis_tkeep = 0;
-reg [S_COUNT-1:0] s_axis_tvalid = 0;
-reg [S_COUNT-1:0] s_axis_tlast = 0;
-reg [S_COUNT*ID_WIDTH-1:0] s_axis_tid = 0;
-reg [S_COUNT*DEST_WIDTH-1:0] s_axis_tdest = 0;
-reg [S_COUNT*USER_WIDTH-1:0] s_axis_tuser = 0;
-reg [M_COUNT-1:0] m_axis_tready = 0;
+reg [S_COUNT*DATA_WIDTH-1:0] s_axis_tdata /*verilator public*/ = 0;
+reg [S_COUNT*KEEP_WIDTH-1:0] s_axis_tkeep /*verilator public*/ = 0;
+reg [S_COUNT-1:0] s_axis_tvalid /*verilator public*/ = 0;
+reg [S_COUNT-1:0] s_axis_tlast /*verilator public*/ = 0;
+reg [S_COUNT*ID_WIDTH-1:0] s_axis_tid /*verilator public*/ = 0;
+reg [S_COUNT*DEST_WIDTH-1:0] s_axis_tdest /*verilator public*/ = 0;
+reg [S_COUNT*USER_WIDTH-1:0] s_axis_tuser /*verilator public*/ = 0;
+reg [M_COUNT-1:0] m_axis_tready /*verilator public*/ = 0;
 
 // Outputs
-wire [S_COUNT-1:0] s_axis_tready;
-wire [M_COUNT*DATA_WIDTH-1:0] m_axis_tdata;
-wire [M_COUNT*KEEP_WIDTH-1:0] m_axis_tkeep;
-wire [M_COUNT-1:0] m_axis_tvalid;
-wire [M_COUNT-1:0] m_axis_tlast;
-wire [M_COUNT*ID_WIDTH-1:0] m_axis_tid;
-wire [M_COUNT*DEST_WIDTH-1:0] m_axis_tdest;
-wire [M_COUNT*USER_WIDTH-1:0] m_axis_tuser;
+wire [S_COUNT-1:0] s_axis_tready /*verilator public*/;
+wire [M_COUNT*DATA_WIDTH-1:0] m_axis_tdata /*verilator public*/;
+wire [M_COUNT*KEEP_WIDTH-1:0] m_axis_tkeep /*verilator public*/;
+wire [M_COUNT-1:0] m_axis_tvalid /*verilator public*/;
+wire [M_COUNT-1:0] m_axis_tlast /*verilator public*/;
+wire [M_COUNT*ID_WIDTH-1:0] m_axis_tid /*verilator public*/;
+wire [M_COUNT*DEST_WIDTH-1:0] m_axis_tdest /*verilator public*/;
+wire [M_COUNT*USER_WIDTH-1:0] m_axis_tuser /*verilator public*/;
 
 initial begin
     // myhdl integration
