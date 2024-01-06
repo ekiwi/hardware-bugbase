@@ -185,7 +185,8 @@ module xlnxstream_2018_3 #
 		axis_tlast_delay <= 1'b0;
 	end else begin
 		axis_tvalid_delay <= axis_tvalid;
-		axis_tlast_delay <= axis_tlast;
+		// FIX: if (!axis_tvalid_delay || M_AXIS_TREADY)
+			axis_tlast_delay <= axis_tlast;
 	end
 
 
