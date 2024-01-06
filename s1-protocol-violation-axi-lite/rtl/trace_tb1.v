@@ -257,7 +257,11 @@ module testbench(input clock, output reg genclock);
       PI_S_AXI_BREADY <= 1'b1;
     end
 
-    genclock <= cycle < 6;
+    if (cycle == 6) begin
+      $finish();
+    end
+
+    genclock <= cycle < 8;
     cycle <= cycle + 1;
   end
 endmodule

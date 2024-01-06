@@ -257,6 +257,10 @@ module testbench(input clock, output reg genclock);
       PI_S_AXI_ARADDR <= 7'b0000000;
     end
 
+    if (cycle == 6) begin
+      $finish();
+    end
+
     genclock <= cycle < 6;
     cycle <= cycle + 1;
   end
