@@ -10,8 +10,10 @@
 #include <exception>
 #include <csetjmp>
 #include <csignal>
+#include <fstream>
 
 #include "Vtestbench.h"
+#include "Vtestbench_testbench.h"
 
 using namespace std;
 
@@ -31,6 +33,16 @@ void sc_time_step() {
     timestamp += pst;
 }
 
+void dump_ios(Vtestbench *tb, std::ofstream &o) {
+    o << static_cast<uint64_t>(tb->testbench->PI_M_AXIS_ARESETN) << ", ";
+    o << static_cast<uint64_t>(tb->testbench->PI_M_AXIS_TREADY) << ", ";
+    o << static_cast<uint64_t>(tb->testbench->M_AXIS_TVALID) << ", ";
+    o << static_cast<uint64_t>(tb->testbench->M_AXIS_TDATA) << ", ";
+    o << static_cast<uint64_t>(tb->testbench->M_AXIS_TSTRB) << ", ";
+    o << static_cast<uint64_t>(tb->testbench->M_AXIS_TLAST);
+    o << std::endl;
+}
+
 int main(int argc, char **argv) {
     Verilated::commandArgs(argc, argv);
     Vtestbench *tb = new Vtestbench;
@@ -41,6 +53,13 @@ int main(int argc, char **argv) {
     string waveform = string(argv[0])+".fst";
     trace->open(waveform.c_str());
 
+    string output_txt_name = string(argv[0]) + "_output.txt";
+    std::ofstream output_txt;
+    output_txt.open(output_txt_name);
+    output_txt << "M_AXIS_ARESETN, M_AXIS_TREADY, M_AXIS_TVALID, M_AXIS_TDATA, ";
+    output_txt << "M_AXIS_TSTRB, M_AXIS_TLAST" << std::endl;
+
+
     if (setjmp(jmp_env) == 0) {
         signal(SIGABRT, &sig_handler);
         signal(SIGINT, &sig_handler);
@@ -48,7 +67,10 @@ int main(int argc, char **argv) {
         goto save_trace_and_exit;
     }
 
-    while (!Verilated::gotFinish()) {
+    tb->eval();
+
+    while (!Verilated::gotFinish() && (tb->genclock != 0)) {
+        dump_ios(tb, output_txt);
         tb->clock = 1;
         tb->eval();
         trace->dump(timestamp);
@@ -59,11 +81,13 @@ int main(int argc, char **argv) {
         trace->dump(timestamp);
         sc_time_step();
     }
+    dump_ios(tb, output_txt);
 
 save_trace_and_exit:
 
     trace->flush();
     trace->close();
+    output_txt.close();
 
     exit(EXIT_SUCCESS);
 }

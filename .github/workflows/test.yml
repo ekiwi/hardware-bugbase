@@ -23,6 +23,9 @@ jobs:
           ["d11-failure-to-update-frame-fifo", "axis_fifo_test.fst"],
           ["d8-misindexing-axis-switch", "test_axis_switch_4x1.fst"],
           ["d7-misindexing-fadd", "fadd.fst"],
+          ["s1-protocol-violation-axi-lite", "sources0_test.vcd"],
+          ["s1-protocol-violation-axi-lite", "sources1_test.vcd"],
+          ["s2-protocol-violation-axi-stream", "sources0_test.fst"],
           ]
     steps:
     - uses: actions/checkout@v3

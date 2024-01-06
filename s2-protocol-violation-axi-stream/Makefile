@@ -3,19 +3,19 @@ RTL_SOURCES?=sources0
 SIM_TOP_MODULE?=testbench
 TEST_DIR?=test
 
-VERILATOR=../../veripass/verilator/bin/verilator
+VERILATOR=verilator
+VERILATOR_ROOT=`$(VERILATOR) --getenv VERILATOR_ROOT`
 VERILATOR_OPT?=
 VERILATOR_OPT+= -cc -timescale-override 10ps/10ps
 VERILATOR_OPT+= -Wno-WIDTH -Wno-LITENDIAN -Wno-UNPACKED -Wno-BLKANDNBLK -Wno-CASEINCOMPLETE \
 				-Wno-CASEX -Wno-PINMISSING
 VERILATOR_OPT+= -trace-fst -trace-structs
 VERILATOR_OPT+= -assert -trace-max-array 65536 -trace-max-width 65536
-VERILATOR_ROOT=$(CURDIR)/../../veripass/verilator
 
 CXX?= g++
 CXX_OPT?=
 CXX_OPT+= -g
-CXX_OPT+= -I$(VERILATOR_ROOT)/include
+CXX_OPT+= -I$(VERILATOR_ROOT)/include -I$(VERILATOR_ROOT)/include/vltstd
 CXX_OPT+= -lz
 VERILATOR_CXX_FILES?= $(VERILATOR_ROOT)/include/verilated.cpp
 VERILATOR_CXX_FILES+= $(VERILATOR_ROOT)/include/verilated_vcd_c.cpp
