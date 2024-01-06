@@ -192,7 +192,8 @@ module xlnxdemo #
 	    end
 	  else
 	    begin
-	      if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID)
+	      // if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID && (!S_AXI_BVALID || S_AXI_BREADY))
+		  if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID)
 	        begin
 	          // slave is ready to accept write address when
 	          // there is a valid write address and write data
@@ -240,7 +241,8 @@ module xlnxdemo #
 	    end
 	  else
 	    begin
-	      if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID)
+	      // if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID && (!S_AXI_BVALID || S_AXI_BREADY))
+		  if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID)
 	        begin
 	          // slave is ready to accept write data when
 	          // there is a valid write address and write data
@@ -617,7 +619,8 @@ module xlnxdemo #
 	    end
 	  else
 	    begin
-	      if (~axi_arready && S_AXI_ARVALID)
+	      // if (~axi_arready && S_AXI_ARVALID && (!S_AXI_RVALID || S_AXI_RREADY))
+		  if (~axi_arready && S_AXI_ARVALID)
 	        begin
 	          // indicates that the slave has acceped the valid read address
 	          axi_arready <= 1'b1;

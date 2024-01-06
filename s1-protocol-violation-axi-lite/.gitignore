@@ -5,3 +5,4 @@ work/
 *_test
 *_work
 *.tcl
+/*output.txt
